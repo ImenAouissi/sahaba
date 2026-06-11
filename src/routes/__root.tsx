@@ -3,29 +3,39 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 
+type PageId = "home" | "sahaba" | "stories" | "quiz" | "contact";
+
+const NAV: { id: PageId; label: string; to: string }[] = [
+  { id: "home",    label: "الرئيسية",   to: "/"        },
+  { id: "sahaba",  label: "الصحابة",    to: "/sahaba"  },
+  { id: "stories", label: "القصص",      to: "/stories" },
+  { id: "quiz",    label: "الاختبار",   to: "/quiz"    },
+  { id: "contact", label: "تواصل معنا", to: "/contact" },
+];
+
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-green-deep px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+        <h1 className="font-display text-7xl text-gold">٤٠٤</h1>
+        <h2 className="mt-4 text-xl font-semibold text-text-main">الصفحة غير موجودة</h2>
+        <p className="mt-2 text-sm text-text-muted">
+          الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full bg-gold px-6 py-2 text-sm font-semibold text-green-deep hover:bg-[color:var(--gold-light)] transition"
           >
-            Go home
+            العودة للرئيسية
           </Link>
         </div>
       </div>
@@ -35,33 +45,26 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
-  const router = useRouter();
-  
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-green-deep px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <h1 className="font-display text-xl text-gold">حدث خطأ</h1>
+        <p className="mt-2 text-sm text-text-muted">
+          حدث خطأ غير متوقع. يمكنك المحاولة مجدداً أو العودة للرئيسية.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={reset}
+            className="inline-flex items-center justify-center rounded-full bg-gold px-6 py-2 text-sm font-semibold text-green-deep transition hover:bg-[color:var(--gold-light)]"
           >
-            Try again
+            حاول مجدداً
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-full border border-gold/50 px-6 py-2 text-sm text-gold transition hover:bg-gold-faint"
           >
-            Go home
-          </a>
+            الرئيسية
+          </Link>
         </div>
       </div>
     </div>
@@ -110,13 +113,85 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function Navbar() {
+  const [navOpen, setNavOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  return (
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-[oklch(0.18_0.025_145/0.92)] border-b border-[color:var(--border)]">
+      <nav className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+        <Link
+          to="/"
+          className="font-display text-2xl text-gold tracking-wide"
+          onClick={() => setNavOpen(false)}
+        >
+          الصحابة الكرام ✦
+        </Link>
+
+        <ul
+          className={`${
+            navOpen ? "flex" : "hidden"
+          } md:flex absolute md:static top-full inset-x-0 md:inset-auto flex-col md:flex-row gap-2 md:gap-8 bg-green-mid md:bg-transparent p-6 md:p-0 border-b md:border-0 border-[color:var(--border)]`}
+        >
+          {NAV.map((n) => {
+            const isActive =
+              n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
+            return (
+              <li key={n.id}>
+                <Link
+                  to={n.to}
+                  onClick={() => setNavOpen(false)}
+                  className={`text-sm font-light transition-colors hover:text-gold ${
+                    isActive
+                      ? "text-gold border-b border-gold pb-0.5"
+                      : "text-text-muted"
+                  }`}
+                >
+                  {n.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        <button
+          onClick={() => setNavOpen((v) => !v)}
+          className="md:hidden text-gold text-xl"
+          aria-label="القائمة"
+        >
+          ☰
+        </button>
+      </nav>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="mt-12 border-t border-[color:var(--border)] bg-[oklch(0.16_0.022_145)]">
+      <div className="max-w-6xl mx-auto px-6 py-8 text-center">
+        <p className="font-display text-lg text-gold/60 mb-2">✦ الصحابة الكرام ✦</p>
+        <p className="text-sm text-text-muted">
+          موقع الصحابة الكرام · صُنع بـ<span className="text-gold">❤</span> لنشر سيرة أصحاب النبي ﷺ
+        </p>
+        <p className="text-xs text-text-dim mt-2">© جميع الحقوق محفوظة 2026 ·</p>
+      </div>
+    </footer>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="min-h-screen bg-green-deep flex flex-col">
+        <Navbar />
+        <main className="bg-beige flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
     </QueryClientProvider>
   );
 }
