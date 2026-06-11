@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sahaba-rasul-allah.vercel.app/sitemap.xml
