@@ -1,6 +1,7 @@
 // src/components/_shared.tsx
 // ─── مكونات مشتركة بين جميع الصفحات ───
 
+import { Link } from "@tanstack/react-router";
 import type { Sahabi, Story } from "@/lib/sahaba-data";
 
 export type PageId = "home" | "sahaba" | "stories" | "quiz" | "contact";
@@ -118,6 +119,7 @@ export function Modal({
             ✕
           </button>
         </div>
+
         <div
           className="p-6 text-[color:var(--text-main)] leading-loose modal-body"
           dangerouslySetInnerHTML={{
@@ -127,6 +129,20 @@ export function Modal({
                 : `<p style="line-height:2.1">${modal.data.full}</p>`,
           }}
         />
+
+        {/* رابط الصفحة المستقلة للصحابي */}
+        {modal.type === "sahabi" && (
+          <div className="px-6 pb-6 flex justify-end">
+            <Link
+              to="/sahaba/$sahabaSlug"
+              params={{ sahabaSlug: modal.data.slug }}
+              onClick={onClose}
+              className="inline-flex items-center gap-2 rounded-full bg-[oklch(0.745_0.115_84/0.1)] border border-gold/40 px-5 py-2 text-sm text-gold hover:bg-[oklch(0.745_0.115_84/0.2)] transition"
+            >
+              اقرأ السيرة كاملة ↗
+            </Link>
+          </div>
+        )}
       </div>
       <style>{`
         .modal-body h4 {
@@ -177,10 +193,7 @@ export function SahabiCard({ s, onOpen }: { s: Sahabi; onOpen: () => void }) {
       : "bg-[oklch(0.55_0.12_160/0.12)] text-[oklch(0.35_0.12_160)] border-[oklch(0.5_0.12_160)]/30";
 
   return (
-    <button
-      onClick={onOpen}
-      className="card-corner group text-right bg-white border border-[color:var(--gold)]/25 rounded-2xl p-6 transition hover:-translate-y-1 hover:border-gold hover:shadow-[0_12px_30px_-12px_rgba(60,40,10,0.25)]"
-    >
+    <div className="card-corner group text-right bg-white border border-[color:var(--gold)]/25 rounded-2xl p-6 transition hover:-translate-y-1 hover:border-gold hover:shadow-[0_12px_30px_-12px_rgba(60,40,10,0.25)]">
       <span
         className={`inline-block text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-full border ${badge} mb-4 font-semibold`}
       >
@@ -189,13 +202,30 @@ export function SahabiCard({ s, onOpen }: { s: Sahabi; onOpen: () => void }) {
       <h3 className="font-display text-2xl text-[color:var(--green-deep)] mb-1">{s.name}</h3>
       <p className="text-xs text-ink-dim mb-3">{s.laqab.split("—")[0].trim()}</p>
       <p className="text-sm text-ink-muted leading-relaxed font-light">{s.short}</p>
-      <div className="mt-5 pt-4 border-t border-[color:var(--gold)]/20 flex items-center justify-between">
+
+      <div className="mt-5 pt-4 border-t border-[color:var(--gold)]/20 flex items-center justify-between gap-2">
         <span className="text-xs text-ink-dim">
           <strong className="text-[color:var(--green-light)] font-semibold">{s.death}</strong>
         </span>
-        <span className="text-[color:var(--gold)]/60 group-hover:text-gold group-hover:-translate-x-1 transition text-lg">←</span>
+        <div className="flex items-center gap-3">
+          {/* ملخص — يفتح المودال */}
+          <button
+            onClick={onOpen}
+            className="text-xs text-ink-muted hover:text-[color:var(--green-deep)] transition font-semibold"
+          >
+            ملخص
+          </button>
+          {/* السيرة كاملة — صفحة مستقلة */}
+          <Link
+            to="/sahaba/$sahabaSlug"
+            params={{ sahabaSlug: s.slug }}
+            className="text-xs font-semibold text-gold hover:text-[color:var(--gold-light)] transition flex items-center gap-1"
+          >
+            السيرة كاملة ↗
+          </Link>
+        </div>
       </div>
-    </button>
+    </div>
   );
 }
 

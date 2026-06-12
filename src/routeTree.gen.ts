@@ -14,6 +14,8 @@ import { Route as SahabaRouteImport } from './routes/sahaba'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StoriesStoryIdRouteImport } from './routes/stories_.$storyId'
+import { Route as SahabaSahabaSlugRouteImport } from './routes/sahaba_.$sahabaSlug'
 
 const StoriesRoute = StoriesRouteImport.update({
   id: '/stories',
@@ -40,6 +42,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoriesStoryIdRoute = StoriesStoryIdRouteImport.update({
+  id: '/stories_/$storyId',
+  path: '/stories/$storyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SahabaSahabaSlugRoute = SahabaSahabaSlugRouteImport.update({
+  id: '/sahaba_/$sahabaSlug',
+  path: '/sahaba/$sahabaSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +59,8 @@ export interface FileRoutesByFullPath {
   '/quiz': typeof QuizRoute
   '/sahaba': typeof SahabaRoute
   '/stories': typeof StoriesRoute
+  '/sahaba/$sahabaSlug': typeof SahabaSahabaSlugRoute
+  '/stories/$storyId': typeof StoriesStoryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +68,8 @@ export interface FileRoutesByTo {
   '/quiz': typeof QuizRoute
   '/sahaba': typeof SahabaRoute
   '/stories': typeof StoriesRoute
+  '/sahaba/$sahabaSlug': typeof SahabaSahabaSlugRoute
+  '/stories/$storyId': typeof StoriesStoryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +78,37 @@ export interface FileRoutesById {
   '/quiz': typeof QuizRoute
   '/sahaba': typeof SahabaRoute
   '/stories': typeof StoriesRoute
+  '/sahaba_/$sahabaSlug': typeof SahabaSahabaSlugRoute
+  '/stories_/$storyId': typeof StoriesStoryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contact' | '/quiz' | '/sahaba' | '/stories'
+  fullPaths:
+    | '/'
+    | '/contact'
+    | '/quiz'
+    | '/sahaba'
+    | '/stories'
+    | '/sahaba/$sahabaSlug'
+    | '/stories/$storyId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contact' | '/quiz' | '/sahaba' | '/stories'
-  id: '__root__' | '/' | '/contact' | '/quiz' | '/sahaba' | '/stories'
+  to:
+    | '/'
+    | '/contact'
+    | '/quiz'
+    | '/sahaba'
+    | '/stories'
+    | '/sahaba/$sahabaSlug'
+    | '/stories/$storyId'
+  id:
+    | '__root__'
+    | '/'
+    | '/contact'
+    | '/quiz'
+    | '/sahaba'
+    | '/stories'
+    | '/sahaba_/$sahabaSlug'
+    | '/stories_/$storyId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +117,8 @@ export interface RootRouteChildren {
   QuizRoute: typeof QuizRoute
   SahabaRoute: typeof SahabaRoute
   StoriesRoute: typeof StoriesRoute
+  SahabaSahabaSlugRoute: typeof SahabaSahabaSlugRoute
+  StoriesStoryIdRoute: typeof StoriesStoryIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +158,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stories_/$storyId': {
+      id: '/stories_/$storyId'
+      path: '/stories/$storyId'
+      fullPath: '/stories/$storyId'
+      preLoaderRoute: typeof StoriesStoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sahaba_/$sahabaSlug': {
+      id: '/sahaba_/$sahabaSlug'
+      path: '/sahaba/$sahabaSlug'
+      fullPath: '/sahaba/$sahabaSlug'
+      preLoaderRoute: typeof SahabaSahabaSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +181,8 @@ const rootRouteChildren: RootRouteChildren = {
   QuizRoute: QuizRoute,
   SahabaRoute: SahabaRoute,
   StoriesRoute: StoriesRoute,
+  SahabaSahabaSlugRoute: SahabaSahabaSlugRoute,
+  StoriesStoryIdRoute: StoriesStoryIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

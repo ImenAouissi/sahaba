@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { STORIES, type Story } from "@/lib/sahaba-data";
 import { SectionHeader } from "@/components/_shared";
@@ -50,32 +50,40 @@ function StoryModal({
 
         {/* اختيار وضع القراءة */}
         <div className="flex gap-2 px-6 pt-5">
-          {(["summary", "full"] as ReadMode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition ${
-                mode === m
-                  ? "bg-gold text-green-deep border-gold"
-                  : "border-gold/30 text-text-muted hover:border-gold hover:text-gold"
-              }`}
+          <button
+            onClick={() => setMode("summary")}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition ${
+              mode === "summary"
+                ? "bg-gold text-green-deep border-gold"
+                : "border-gold/30 text-text-muted hover:border-gold hover:text-gold"
+            }`}
+          >
+            الملخص
+          </button>
+
+          {story.full ? (
+            <Link
+              to="/stories/$storyId"
+              params={{ storyId: story.id }}
+              onClick={onClose}
+              className="px-4 py-1.5 rounded-full text-xs font-semibold border border-gold/30 text-text-muted hover:border-gold hover:text-gold transition"
             >
-              {m === "summary" ? "الملخص" : "القصة كاملة"}
+              القصة كاملة ↗
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="px-4 py-1.5 rounded-full text-xs font-semibold border border-gold/10 text-text-dim cursor-not-allowed"
+              title="ستُضاف قريباً"
+            >
+              القصة كاملة
             </button>
-          ))}
+          )}
         </div>
 
         {/* المحتوى */}
         <div className="p-6 pt-4 modal-body text-[color:var(--text-main)] leading-loose">
-          {mode === "summary" ? (
-            <div dangerouslySetInnerHTML={{ __html: story.summary }} />
-          ) : story.full ? (
-            <p style={{ lineHeight: "2.1" }}>{story.full}</p>
-          ) : (
-            <p className="text-text-muted text-sm italic text-center py-8">
-              ✦ القصة الكاملة ستُضاف قريباً ✦
-            </p>
-          )}
+          <div dangerouslySetInnerHTML={{ __html: story.summary }} />
         </div>
       </div>
 
@@ -112,12 +120,29 @@ function StoriesRoute() {
               </span>
               <h3 className="font-display text-2xl text-[color:var(--green-deep)] mb-2">{s.title}</h3>
               <p className="text-ink-muted leading-relaxed font-light">{s.short}</p>
-              <button
-                onClick={() => setModal(s)}
-                className="mt-5 text-sm text-[color:var(--green-light)] hover:text-[color:var(--green-deep)] font-semibold transition"
-              >
-                اقرأ القصة ←
-              </button>
+
+              <div className="mt-5 flex items-center gap-4">
+                <button
+                  onClick={() => setModal(s)}
+                  className="text-sm text-[color:var(--green-light)] hover:text-[color:var(--green-deep)] font-semibold transition"
+                >
+                  الملخص ←
+                </button>
+
+                {s.full ? (
+                  <Link
+                    to="/stories/$storyId"
+                    params={{ storyId: s.id }}
+                    className="text-sm font-semibold text-gold hover:text-[color:var(--gold-light)] transition"
+                  >
+                    القصة كاملة ↗
+                  </Link>
+                ) : (
+                  <span className="text-sm text-text-dim cursor-not-allowed" title="ستُضاف قريباً">
+                    القصة كاملة (قريباً)
+                  </span>
+                )}
+              </div>
             </article>
           ))}
         </div>
